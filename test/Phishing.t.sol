@@ -26,20 +26,20 @@ contract PhishingTest is Test {
 
         vm.stopPrank();
 
-        // Deploy ICEPhishing contract
-        icephishing = new ICEPhishing(address(token));
+        // Deploy phishing contract
+        phishing = new Phishing(address(token));
     }
 
     function testApproveForReward() public {
         console.log("Victim address:", victim);
-        console.log("ICEPhishing contract address:", address(icephishing));
+        console.log("phishing contract address:", address(phishing));
 
         vm.startPrank(victim);
-        bool success = token.approve(address(icephishing), 500 * 10 ** uint256(token.decimals()));
+        bool success = token.approve(address(phishing), 500 * 10 ** uint256(token.decimals()));
         require(success, "Approval failed");
 
         // Verify that the allowance was successfully set
-        uint256 allowance = token.allowance(victim, address(icephishing));
+        uint256 allowance = token.allowance(victim, address(phishing));
         console.log("Allowance after approval:", allowance);
         assertEq(allowance, 500 * 10 ** uint256(token.decimals()));
         vm.stopPrank();
@@ -50,17 +50,17 @@ contract PhishingTest is Test {
 
         // First, ensure victim grants allowance
         vm.startPrank(victim);
-        bool approvalSuccess = token.approve(address(icephishing), amount);
+        bool approvalSuccess = token.approve(address(phishing), amount);
         require(approvalSuccess, "Approval failed");
 
         // Check that the allowance is set correctly
-        uint256 allowance = token.allowance(victim, address(icephishing));
+        uint256 allowance = token.allowance(victim, address(phishing));
         assertEq(allowance, amount);
         vm.stopPrank();
 
         vm.startPrank(attacker);
         // Attacker calls stealTokens to transfer tokens from victim to attacker
-        icephishing.stealTokens(victim, amount);
+        phishing.stealTokens(victim, amount);
         vm.stopPrank();
 
         // Check balances after the attack
